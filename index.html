@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NammaRoute - Your Smart Travel Companion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Global Styles */
+        :root {
+            --primary: #2E8B57;
+            --secondary: #1E90FF;
+            --accent: #20B2AA;
+            --light: #F5FFFA;
+            --dark: #2F4F4F;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn:hover {
+            background: #267349;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background: #1a7ad9;
+        }
+        
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            color: var(--dark);
+            font-size: 2.5rem;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(46, 139, 87, 0.8), rgba(30, 144, 255, 0.8)), url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 120px 0;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Features Preview */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .feature-card i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        /* Demo Preview */
+        .demo-preview {
+            background: var(--light);
+            text-align: center;
+        }
+        
+        .route-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .route-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .route-card h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .route-card .time {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 10px 0;
+        }
+        
+        .route-card .fare {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        /* Why Choose */
+        .why-choose {
+            background: white;
+        }
+        
+        .bullet-points {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .bullet-point {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+        
+        .bullet-point i {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        /* Page Styles */
+        .page {
+            display: none;
+            padding: 80px 0;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .team-card {
+            text-align: center;
+        }
+        
+        .team-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .team-img i {
+            font-size: 4rem;
+            color: #aaa;
+        }
+        
+        /* Demo Page */
+        .planner {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .route-results {
+            margin-top: 30px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 0;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                background: white;
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px 0;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                transition: left 0.3s ease;
+            }
+            
+            .nav-links.active {
+                left: 0;
+            }
+            
+            .nav-links li {
+                margin: 15px 0;
+            }
+            
+            .hamburger {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="navbar">
+                <a href="#" class="logo" onclick="showPage('home')">
+                    <i class="fas fa-route"></i> NammaRoute
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="showPage('home')">Home</a></li>
+                    <li><a href="features.html" onclick="showPage('features')">Features</a></li>
+                    <li><a href="DemoPage.html" onclick="showPage('demo')">Demo</a></li>
+                    <li><a href="about.html" onclick="showPage('about')">About Us</a></li>
+                    <li><a href="contact.html" onclick="showPage('contact')">Contact</a></li>
+                </ul>
+                <div class="hamburger" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>Your Smart Travel Companion</h1>
+                <p>Find the best routes, compare transport options, and save time and money on your daily commute</p>
+                <a href="DemoPage.html" class="btn" onclick="showPage('demo')">Try Demo</a>
+            </div>
+        </section>
+
+        <!-- Problem & Solution -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Smart Travel Planning</h2>
+                <div class="card">
+                    <h3>The Problem</h3>
+                    <p>Urban commuting is often stressful with traffic congestion, multiple transport options, and unpredictable travel times. Commuters waste time and money choosing suboptimal routes.</p>
+                    
+                    <h3>Our Solution</h3>
+                    <p>NammaRoute analyzes real-time traffic data, transport options, and pricing to recommend the fastest, cheapest, and most convenient routes for your journey.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Preview -->
+        <section class="section" style="background-color: #f5f9ff;">
+            <div class="container">
+                <h2 class="section-title">Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card card">
+                        <i class="fas fa-route"></i>
+                        <h3>Smart Route Planning</h3>
+                        <p>Get optimized routes based on real-time traffic conditions and your preferences.</p>
+                        <a href="features.html" class="btn" onclick="showPage('features')">Learn More</a>
+                    </div>
+                    <div class="feature-card card">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h3>Fare Estimation</h3>
+                        <p>Compare prices across different transport modes before you travel.</p>
+                        <a href="features.html" class="btn" onclick="showPage('features')">Learn More</a>
+                    </div>
+                    <div class="feature-card card">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Real-Time Updates</h3>
+                        <p>Receive live updates about traffic, delays, and better route options.</p>
+                        <a href="features.html" class="btn" onclick="showPage('features')">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Preview -->
+        <section class="section demo-preview">
+            <div class="container">
+                <h2 class="section-title">Plan Your Journey</h2>
+                <p class="section-subtitle">Anna Nagar → Central Station</p>
+                
+                <div class="route-options">
+                    <div class="route-card">
+                        <h4>Fastest Route</h4>
+                        <div class="time">32 min</div>
+                        <div class="fare">₹85</div>
+                        <p>Direct cab with minimal traffic</p>
+                    </div>
+                    <div class="route-card">
+                        <h4>Cheapest Route</h4>
+                        <div class="time">48 min</div>
+                        <div class="fare">₹35</div>
+                        <p>Bus → Metro → Walk</p>
+                    </div>
+                    <div class="route-card">
+                        <h4>Metro-First</h4>
+                        <div class="time">38 min</div>
+                        <div class="fare">₹45</div>
+                        <p>Walk → Metro → Auto</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="DemoPage.html" class="btn" onclick="showPage('demo')">Try Full Demo</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose -->
+        <section class="section why-choose">
+            <div class="container">
+                <h2 class="section-title">Why Choose NammaRoute?</h2>
+                
+                <div class="bullet-points">
+                    <div class="bullet-point">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h3>Save Time & Money</h3>
+                            <p>We compare all transport options to find the best balance between cost and travel time.</p>
+                        </div>
+                    </div>
+                    <div class="bullet-point">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h3>Reduce Stress</h3>
+                            <p>Plan your journey with confidence using real-time traffic and transit data.</p>
+                        </div>
+                    </div>
+                    <div class="bullet-point">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h3>Eco-Friendly Options</h3>
+                            <p>Discover greener travel alternatives and reduce your carbon footprint.</p>
+                        </div>
+                    </div>
+                    <div class="bullet-point">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h3>Always Up-to-Date</h3>
+                            <p>Our algorithms continuously monitor traffic patterns and transit schedules.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Features Page -->
+    <div id="features" class="page">
+        <section class="section

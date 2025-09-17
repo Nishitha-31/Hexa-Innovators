@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NammaRoute - Fastest Route</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        /* Reuse the same styles from DemoPage.html */
+        :root {
+            --primary: #2E8B57;
+            --secondary: #1E90FF;
+            --accent: #20B2AA;
+            --light: #F5FFFA;
+            --dark: #2F4F4F;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn:hover {
+            background: #267349;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background: #1a7ad9;
+        }
+        
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            color: var(--dark);
+            font-size: 2.5rem;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+        }
+        
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        
+        /* Route Details */
+        .route-details {
+            margin-top: 50px;
+        }
+        
+        .journey-summary {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .journey-details {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .journey-point {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 8px;
+        }
+        
+        .journey-point h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .journey-point h3 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .route-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .route-badge {
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .route-metrics {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 8px;
+        }
+        
+        .metric {
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        
+        .route-steps {
+            margin: 30px 0;
+        }
+        
+        .route-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+            border-radius: 50%;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .step-details {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .step-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .step-distance {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        /* Map View */
+        .map-view {
+            margin-top: 50px;
+        }
+        
+        .map-container {
+            height: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        #route-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .map-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        /* Actions */
+        .route-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+            margin-top: 80px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 0;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                background: white;
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px 0;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                transition: left 0.3s ease;
+            }
+            
+            .nav-links.active {
+                left: 0;
+            }
+            
+            .nav-links li {
+                margin: 15px 0;
+            }
+            
+            .hamburger {
+                display: block;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .journey-point {
+                min-width: 100%;
+            }
+            
+            .route-metrics {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .route-step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .step-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .route-actions {
+                flex-direction: column;
+            }
+            
+            .map-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="navbar">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-route"></i> NammaRoute
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="DemoPage.html">Demo</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <div class="hamburger" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Route Details Section -->
+    <section class="section">
+        <div class="container">
+            <div class="route-details">
+                <!-- Journey Summary -->
+                <div class="journey-summary">
+                    <h3>Your Fastest Route</h3>
+                    <div class="journey-details">
+                        <div class="journey-point">
+                            <h3><i class="fas fa-map-marker-alt"></i> From</h3>
+                            <p id="source-location">Anna Nagar</p>
+                        </div>
+                        <div class="journey-point">
+                            <h3><i class="fas fa-flag-checkered"></i> To</h3>
+                            <p id="destination-location">Central Railway Station</p>
+                        </div>
+                        <div class="journey-point">
+                            <h3><i class="fas fa-users"></i> Travelers</h3>
+                            <p id="persons-count">2 Persons</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Route Information -->
+                <div class="card">
+                    <div class="route-header">
+                        <h2><i class="fas fa-bolt"></i> Fastest Route</h2>
+                        <span class="route-badge">45 minutes</span>
+                    </div>
+                    
+                    <div class="route-metrics">
+                        <div class="metric">
+                            <div class="metric-value">₹70</div>
+                            <div class="metric-label">Total Fare</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">2.1</div>
+                            <div class="metric-label">km CO₂</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">3</div>
+                            <div class="metric-label">Transfers</div>
+                        </div>
+                    </div>
+                    
+                    <div class="route-steps">
+                        <div class="route-step">
+                            <div class="step-icon">
+                                <i class="fas fa-motorcycle"></i>
+                            </div>
+                            <div class="step-details">
+                                <div class="step-title">Rapido Bike</div>
+                                <div class="step-description">From Anna Nagar to Koyambedu Metro Station</div>
+                            </div>
+                            <div class="step-distance">₹30 • 15 min</div>
+                        </div>
+                        
+                        <div class="route-step">
+                            <div class="step-icon">
+                                <i class="fas fa-subway"></i>
+                            </div>
+                            <div class="step-details">
+                                <div class="step-title">Metro</div>
+                                <div class="step-description">From Koyambedu to Central Metro Station</div>
+                            </div>
+                            <div class="step-distance">₹40 • 20 min</div>
+                        </div>
+                        
+                        <div class="route-step">
+                            <div class="step-icon">
+                                <i class="fas fa-walking"></i>
+                            </div>
+                            <div class="step-details">
+                                <div class="step-title">Walk</div>
+                                <div class="step-description">From Central Metro Station to Railway Station</div>
+                            </div>
+                            <div class="step-distance">Free • 10 min</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map View -->
+                <div class="map-view">
+                    <h2 class="section-subtitle">Route Map</h2>
+                    <div class="map-container">
+                        <div id="route-map"></div>
+                    </div>
+                    <div class="map-actions">
+                        <button class="btn" onclick="shareRoute()">
+                            <i class="fas fa-share-alt"></i> Share Route
+                        </button>
+                        <button class="btn btn-secondary" onclick="printRoute()">
+                            <i class="fas fa-print"></i> Print Directions
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="route-actions">
+                    <button class="btn" onclick="window.history.back()">
+                        <i class="fas fa-arrow-left"></i> Back to Routes
+                    </button>
+                    <button class="btn btn-secondary" onclick="startNavigation()">
+                        <i class="fas fa-play"></i> Start Navigation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>NammaRoute</h3>
+                    <p>Your intelligent travel companion for seamless multi-modal transportation planning in urban environments.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="DemoPage.html">Demo</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-links">AVV, Chennai, India</li>
+                        <li><i class="fas fa-envelope"></i> nammaroute@gmail.com</li>
+                        <li><i class="fas fa-phone"></i> +91 1234567890</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 NammaRoute. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Toggle mobile menu
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+
+        // Initialize Map
+        // Initialize Map
+// Initialize Map
+// Initialize Map
+function initMap() {
+    const map = L.map('route-map').setView([13.08, 80.24], 13); // Centered along Chennai route
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Start Marker - Anna Nagar
+    L.marker([13.0839, 80.2200]).addTo(map)
+        .bindPopup('Anna Nagar - Start')
+        .openPopup();
+    
+    // End Marker - Chennai Central
+    L.marker([13.0827, 80.2707]).addTo(map)
+        .bindPopup('Chennai Central Railway Station - Destination');
+    
+    // Safe Shelter - MG Metro Station
+    L.marker([13.0765, 80.2280]).addTo(map)
+        .bindPopup('MG Metro Station - Safe Shelter')
+        .setIcon(
+            L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            })
+        );
+    
+    // Polyline for route
+    const routeCoordinates = [
+        [13.0839, 80.2200], // Anna Nagar
+        [13.0800, 80.2300],
+        [13.0770, 80.2400],
+        [13.0750, 80.2500],
+        [13.0827, 80.2707]  // Chennai Central
+    ];
+    
+    L.polyline(routeCoordinates, {color: 'blue', weight: 5, opacity: 0.7}).addTo(map);
+    
+    // Fit map to route
+    map.fitBounds(routeCoordinates);
+}
+
+
+        // Map helper functions
+        function shareRoute() {
+            alert('Route sharing feature coming soon!');
+        }
+
+        function printRoute() {
+            window.print();
+        }
+
+        function startNavigation() {
+            alert('Starting navigation...');
+        }
+
+        // Initialize map on page load
+        window.onload = initMap;
+    </script>
+</body>
+</html>
